@@ -5,6 +5,10 @@ import io.github.dgflagg.exceptions.NegativeIndexException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -184,6 +188,11 @@ public class Matrix {
         return column;
     }
 
+    /**
+     * Creates a new Matrix from the two dimensional array of doubles
+     * @param numbers
+     * @return
+     */
     public static Matrix buildMatrix(List<List<Double>> numbers) {
         log.info("building new matrix");
 
@@ -191,6 +200,71 @@ public class Matrix {
         matrix.setName("matrix");
         matrix.setNumbers(numbers);
 
+        return matrix;
+    }
+
+    /**
+     * Creates a matrix instance from a standard csv file where the elements are separated by commas
+     * and the rows are separated by new lines
+     * @param file
+     * @return
+     */
+    public static Matrix csv(String file) {
+        log.info("creating matrix from csv file: {}", file);
+
+        String CSV_RECORD_DELIMITER = ",";
+
+        List<List<Double>> numbers = new ArrayList<>();
+
+        String line = "";
+        BufferedReader br = null;
+        try {
+
+            br = new BufferedReader(new FileReader(file));
+            while ((line = br.readLine()) != null) {
+
+                List<Double> row = new ArrayList<>();
+
+                String[] elements = line.split(CSV_RECORD_DELIMITER);
+
+                for(int i = 0; i < elements.length; i++) {
+
+                    row.add(new Double(elements[i]));
+
+                }
+
+                numbers.add(row);
+
+            }
+
+        } catch (FileNotFoundException e) {
+
+            log.error(e.getMessage());
+
+        } catch (IOException e) {
+
+            log.error(e.getMessage());
+
+        } finally {
+
+            if (br != null) {
+
+                try {
+
+                    br.close();
+
+                } catch (IOException e) {
+
+                    log.error(e.getMessage());
+
+                }
+
+            }
+
+        }
+
+        Matrix matrix = Matrix.buildMatrix(numbers);
+        matrix.setName(file);
         return matrix;
     }
 
