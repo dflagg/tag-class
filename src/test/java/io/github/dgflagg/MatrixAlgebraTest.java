@@ -1,8 +1,12 @@
 package io.github.dgflagg;
 
+import io.github.dgflagg.exceptions.ColumnsMustEqualRowsException;
 import io.github.dgflagg.exceptions.DimensionsNotSimilarException;
 import io.github.dgflagg.model.Matrix;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertFalse;
@@ -90,6 +94,45 @@ public class MatrixAlgebraTest {
         Matrix m2 = Matrix.buildZeroMatrix(N, N + 1);
 
         MatrixAlgebra.add(m1,m2);
+    }
+
+    @Test(expected = DimensionsNotSimilarException.class)
+    public void verify_dotProduct_throws_DimensionsNotSimilarException_when_vector_size_is_different() {
+        Matrix m1 = Matrix.buildZeroMatrix(N, N + 1);
+        MatrixAlgebra.dotProduct(m1.getRow(0), m1.getColumn(0));
+    }
+
+    @Test
+    public void verify_dotProduct() {
+        List<Double> v1 = new ArrayList<>();
+        v1.add(1d);
+        v1.add(2d);
+        v1.add(3d);
+
+        List<Double> v2 = new ArrayList<>();
+        v2.add(-2d);
+        v2.add(0d);
+        v2.add(5d);
+
+        Double product = MatrixAlgebra.dotProduct(v1, v2);
+        assertThat(product, equalTo(13d));
+    }
+
+    @Test(expected = ColumnsMustEqualRowsException.class)
+    public void verify_multiply_throws_ColumnsMustEqualRowsException_when_columns_do_not_equal_rows() {
+        Matrix m1 = Matrix.buildZeroMatrix(N, N);
+        Matrix m2 = Matrix.buildZeroMatrix(N + 1, N);
+        MatrixAlgebra.multiply(m1, m2);
+    }
+
+    @Test
+    public void verify_multiply() {
+        Matrix A = Matrix.csv("src/test/resources/A.csv");
+        Matrix B = Matrix.csv("src/test/resources/B.csv");
+        Matrix AB = Matrix.csv("src/test/resources/AB.csv");
+
+        Matrix result = MatrixAlgebra.multiply(A, B);
+        assertTrue(MatrixAlgebra.isEqual(result, AB));
     }
 
 }
