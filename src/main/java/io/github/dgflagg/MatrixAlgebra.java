@@ -1,6 +1,7 @@
 package io.github.dgflagg;
 
 import io.github.dgflagg.exceptions.DimensionsNotSimilarException;
+import io.github.dgflagg.exceptions.ColumnsMustEqualRowsException;
 import io.github.dgflagg.model.Matrix;
 import lombok.extern.slf4j.Slf4j;
 
@@ -92,6 +93,79 @@ public class MatrixAlgebra {
         Matrix sum = Matrix.buildMatrix(numbers);
 
         return sum;
+    }
+
+    /**
+     * Returns the dot product of two vectors of equal dimension
+     * @param v1 vector
+     * @param v2 vector
+     * @return
+     */
+    public static Double dotProduct(List<Double> v1, List<Double> v2) {
+        log.info("finding the dot product of v1 and v2");
+
+        //check that the dimensions of both vectors are similar
+        if(v1.size() != v2.size()) {
+            DimensionsNotSimilarException e = new DimensionsNotSimilarException("length of vectors must be equal to find dot product");
+            log.error(e.getMessage());
+            throw e;
+        }
+
+        Double product = 0.0;
+
+        //iterate through each of the elements in both vectors
+        for(int i = 0; i < v1.size(); i++) {
+
+            //multiply the elements in the corresponding positions
+            Double multRes = v1.get(i) * v2.get(i);
+            //add the result to the product total
+            product = product + multRes;
+
+        }
+
+        return product;
+    }
+
+    /**
+     * Multiplies m1 by m2, returning a the product matrix of m1 rows by m2 columns
+     * @param m1 matrix A
+     * @param m2 matrix B
+     * @return
+     */
+    public static Matrix multiply(Matrix m1, Matrix m2) {
+        log.info("multiplying matrix: " + m1.getName() + " by: " + m2.getName());
+
+        //check that m1 columns are equal to m2 rows
+        if(m1.getColumnCount() != m2.getRowCount()) {
+            ColumnsMustEqualRowsException e = new ColumnsMustEqualRowsException("the columns of m1 must equal the rows of m2");
+            log.error(e.getMessage());
+            throw e;
+        }
+
+        List<List<Double>> numbers = new ArrayList<>();
+
+        //iterate through rows of m1
+        for(int m1RowIndex = 0; m1RowIndex < m1.getRowCount(); m1RowIndex++) {
+
+            List<Double> m1RowVector = m1.getRow(m1RowIndex);
+            List<Double> row = new ArrayList<>();
+
+            //iterate through columns of m2
+            for(int m2ColIndex = 0; m2ColIndex < m2.getColumnCount(); m2ColIndex++) {
+
+                List<Double> m2ColVector = m2.getColumn(m2ColIndex);
+                //find the dot product of the vectors
+                Double product = MatrixAlgebra.dotProduct(m1RowVector, m2ColVector);
+                row.add(product);
+
+            }
+
+            numbers.add(row);
+
+        }
+
+        Matrix product = Matrix.buildMatrix(numbers);
+        return product;
     }
 
     /**
