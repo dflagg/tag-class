@@ -126,4 +126,19 @@ public class MatrixTest {
         assertFalse(ZERO_MATRIX.isSquare());
     }
 
+    @Test
+    public void verify_csv() {
+        Matrix m3x3 = Matrix.csv("src/test/resources/3x3-matrix.csv");
+        assertThat(m3x3.getRowCount(), equalTo(3));
+        assertThat(m3x3.getColumnCount(), equalTo(3));
+
+        Matrix m4x2 = Matrix.csv("src/test/resources/4x2-matrix.csv");
+        assertThat(m4x2.getRowCount(), equalTo(4));
+        assertThat(m4x2.getColumnCount(), equalTo(2));
+
+        Matrix m2x4 = Matrix.csv("src/test/resources/2x4-matrix.csv");
+        assertThat(m2x4.getRowCount(), equalTo(2));
+        assertThat(m2x4.getColumnCount(), equalTo(4));
+    }
+
 }
