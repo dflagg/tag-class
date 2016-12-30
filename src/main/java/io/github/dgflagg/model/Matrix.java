@@ -4,6 +4,7 @@ import io.github.dgflagg.exceptions.IndexExceedsSizeException;
 import io.github.dgflagg.exceptions.NegativeIndexException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -55,7 +56,22 @@ public class Matrix {
 
     @Override
     public String toString() {
-        return "";
+
+        String str = "";
+
+        for(List<Double> row : numbers) {
+
+            for(Double number : row) {
+
+                str = str.concat(number + " ");
+
+            }
+
+            str = str.concat("\n");
+
+        }
+
+        return str;
     }
 
     /**
@@ -64,7 +80,9 @@ public class Matrix {
      * @return
      */
     public static Matrix buildIdentityMatrix(int n) {
-        log.info("building identify matrix when n = {}", n);
+        log.info("building identity matrix when n = {}", n);
+
+        Assert.isTrue(n > -1, "cannot create a matrix with negative dimension size");
 
         Matrix identityMatrix = new Matrix();
         identityMatrix.setName("I" + n);
@@ -105,6 +123,9 @@ public class Matrix {
      */
     public static Matrix buildZeroMatrix(int m, int n) {
         log.info("building empty matrix when m = {} and n = {}", m, n);
+
+        Assert.isTrue(n > -1, "cannot create a matrix with negative dimension size");
+        Assert.isTrue(m > -1, "cannot create a matrix with negative dimension size");
 
         Matrix matrix = new Matrix();
         matrix.setName("zero (" + m + ", " + n + ") matrix");
