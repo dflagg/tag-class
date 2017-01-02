@@ -26,72 +26,114 @@ public class MatrixControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void idMatrixShouldReturnIdMatrixOfSizeN() throws Exception {
+    public void idShouldReturnIdMatrixOfSizeN() throws Exception {
         int N = 3;
         Matrix matrix = Matrix.buildIdentityMatrix(N);
 
-        this.mockMvc.perform(get("/idMatrix").param("n", N + ""))
+        this.mockMvc.perform(get("/matrix/id").param("n", N + ""))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("*").value(matrix.getNumbers()));
     }
 
     @Test
-    public void idMatrixShouldReturnIdMatrixOfSizeOne() throws Exception {
+    public void idShouldReturnIdMatrixOfSizeOne() throws Exception {
         int N = 1;
         Matrix matrix = Matrix.buildIdentityMatrix(N);
 
-        this.mockMvc.perform(get("/idMatrix").param("n", N + ""))
+        this.mockMvc.perform(get("/matrix/id").param("n", N + ""))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("*").value(matrix.getNumbers()));
     }
 
     @Test
-    public void idMatrixShouldReturnIdMatrixOfSizeZeroByDefault() throws Exception {
+    public void idShouldReturnIdMatrixOfSizeZeroByDefault() throws Exception {
         Matrix matrix = Matrix.buildZeroMatrix(0,0);
-        this.mockMvc.perform(get("/idMatrix"))
+        this.mockMvc.perform(get("/matrix/id"))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("*").value(matrix.getNumbers()));
     }
 
     @Test
-    public void zeroMatrixShouldReturnZeroMatrixOfSizeMxN() throws Exception {
+    public void zeroShouldReturnZeroMatrixOfSizeMxN() throws Exception {
         int M = 2;
         int N = 3;
         Matrix matrix = Matrix.buildZeroMatrix(M, N);
 
-        this.mockMvc.perform(get("/zeroMatrix").param("n", N + "").param("m", M + ""))
+        this.mockMvc.perform(get("/matrix/zero").param("n", N + "").param("m", M + ""))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("*").value(matrix.getNumbers()));
     }
 
     @Test
-    public void zeroMatrixShouldReturnZeroMatrixOfSizeOne() throws Exception {
+    public void zeroShouldReturnZeroMatrixOfSizeOne() throws Exception {
         int M = 1;
         int N = 1;
         Matrix matrix = Matrix.buildZeroMatrix(M, N);
 
-        this.mockMvc.perform(get("/zeroMatrix").param("n", N + "").param("m", M + ""))
+        this.mockMvc.perform(get("/matrix/zero").param("n", N + "").param("m", M + ""))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("*").value(matrix.getNumbers()));
     }
 
     @Test
-    public void zeroMatrixShouldReturnZeroMatrixOfSizeZeroByDefault() throws Exception {
+    public void zeroShouldReturnZeroMatrixOfSizeZeroByDefault() throws Exception {
         Matrix matrix = Matrix.buildZeroMatrix(0,0);
-        this.mockMvc.perform(get("/zeroMatrix"))
+        this.mockMvc.perform(get("/matrix/zero"))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("*").value(matrix.getNumbers()));
     }
 
     @Test
-    public void scalarMultShouldReturnScalarProductMatrix() throws Exception {
+    public void scalarShouldReturnScalarProductMatrix2x4() throws Exception {
         double SCALAR = 3;
         Matrix operandMatrix = Matrix.csv("src/test/resources/2x4-matrix.csv");
         Matrix resultMatrix = MatrixAlgebra.scalarMultiply(operandMatrix, SCALAR);
 
-        this.mockMvc.perform(get("/scalarMult").param("s", SCALAR + "").param("m", operandMatrix.getNumbers().toString().replace(" ","")))
+        this.mockMvc.perform(get("/matrix/scalar").param("s", SCALAR + "").param("m", operandMatrix.toString()))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("*").value(resultMatrix.getNumbers()));
+    }
+
+    @Test
+    public void scalarShouldReturnScalarProductMatrix3x3() throws Exception {
+        double SCALAR = 2.3;
+        Matrix operandMatrix = Matrix.csv("src/test/resources/3x3-matrix.csv");
+        Matrix resultMatrix = MatrixAlgebra.scalarMultiply(operandMatrix, SCALAR);
+
+        this.mockMvc.perform(get("/matrix/scalar").param("s", SCALAR + "").param("m", operandMatrix.toString()))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("*").value(resultMatrix.getNumbers()));
+    }
+
+    @Test
+    public void scalarShouldReturnScalarProductMatrix4x2() throws Exception {
+        double SCALAR = -2;
+        Matrix operandMatrix = Matrix.csv("src/test/resources/4x2-matrix.csv");
+        Matrix resultMatrix = MatrixAlgebra.scalarMultiply(operandMatrix, SCALAR);
+
+        this.mockMvc.perform(get("/matrix/scalar").param("s", SCALAR + "").param("m", operandMatrix.toString()))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("*").value(resultMatrix.getNumbers()));
+    }
+
+    @Test
+    public void scalarShouldReturnScalarProductMatrixOfScalarOneByDefault() throws Exception {
+        Matrix operandMatrix = Matrix.csv("src/test/resources/4x2-matrix.csv");
+
+        this.mockMvc.perform(get("/matrix/scalar").param("m", operandMatrix.toString()))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("*").value(operandMatrix.getNumbers()));
+    }
+
+    @Test
+    public void addShouldReturnSumMatrix() throws Exception {
+        Matrix m1 = Matrix.csv("src/test/resources/3x3-matrix.csv");
+        Matrix m2 = Matrix.buildValueMatrix(3,3,5d);
+        Matrix sumMatrix = MatrixAlgebra.add(m1,m2);
+
+        this.mockMvc.perform(get("/matrix/add").param("m1", m1.toString()).param("m2", m2.toString()))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("*").value(sumMatrix.getNumbers()));
     }
 
 }

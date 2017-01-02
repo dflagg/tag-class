@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,12 +13,19 @@ import java.util.List;
  */
 @Slf4j
 @RestController
+@RequestMapping("/matrix")
 public class MatrixController {
     private static final int DEFAULT_MATRIX_N = 0;
     private static final int DEFAULT_MATRIX_M = 0;
 
-    @RequestMapping("/idMatrix")
-    public List<List<Double>> idMatrix(@RequestParam(value="n", defaultValue="0") String nValue) {
+    //TODO: add matrix multiplication request mapping
+
+    //TODO: add error response codes with appropriate messages for bad input
+
+    //TODO: accept put/post request to persist a matrix to file or db
+
+    @RequestMapping("/id")
+    public List<List<Double>> id(@RequestParam(value="n", defaultValue="0") String nValue) {
 
         int n = DEFAULT_MATRIX_N;
 
@@ -41,8 +47,8 @@ public class MatrixController {
         return matrix.getNumbers();
     }
 
-    @RequestMapping("/zeroMatrix")
-    public List<List<Double>> zeroMatrix(@RequestParam(value="m", defaultValue="0") String mValue,
+    @RequestMapping("/zero")
+    public List<List<Double>> zero(@RequestParam(value="m", defaultValue="0") String mValue,
                                          @RequestParam(value="n", defaultValue="0") String nValue) {
         int m = DEFAULT_MATRIX_M;
         int n = DEFAULT_MATRIX_N;
@@ -66,50 +72,42 @@ public class MatrixController {
         return matrix.getNumbers();
     }
 
-    @RequestMapping("/scalarMult")
-    public List<List<Double>> scalarMult(@RequestParam(value="s", defaultValue="1") String sValue,
+    @RequestMapping("/scalar")
+    public List<List<Double>> scalar(@RequestParam(value="s", defaultValue="1") String sValue,
                                          @RequestParam(value="m", defaultValue="[]") String mValue) {
 
         double s = 1;  //default scalar
         Matrix m1 = Matrix.buildZeroMatrix(DEFAULT_MATRIX_M,DEFAULT_MATRIX_N);
 
-        //TODO: this is a mess - clean this method up
-
         try {
             s = Double.parseDouble(sValue);
-
-            String strippedWrapperBrackets = mValue.substring(1, mValue.length() - 1);
-            String[] rows = strippedWrapperBrackets.split("],\\[");
-
-            List<List<Double>> numbers = new ArrayList<List<Double>>();
-
-            for(String row : rows) {
-                String[] values = row.replace("[","").replace("]","").split(",");
-
-                List<Double> numberRows = new ArrayList<Double>();
-
-                for(String value : values) {
-
-                    Double number = new Double(value);
-                    numberRows.add(number);
-
-                }
-
-                numbers.add(numberRows);
-
-            }
-
-            m1 = Matrix.buildMatrix(numbers);
-
+            m1 = Matrix.fromString(mValue);
         } catch (NumberFormatException e) {
             log.error("original error: " + e.getMessage());
-            //log.error("cannot parse: \"" + sValue + "\" to an integer");
             //TODO: more error handling
         }
 
         Matrix scalarProduct = MatrixAlgebra.scalarMultiply(m1, s);
-
         return scalarProduct.getNumbers();
+    }
+
+    @RequestMapping("/add")
+    public List<List<Double>> add(@RequestParam(value="m1", defaultValue="[]") String m1Value,
+                                  @RequestParam(value="m2", defaultValue="[]") String m2Value) {
+
+        Matrix m1 = Matrix.buildZeroMatrix(DEFAULT_MATRIX_M,DEFAULT_MATRIX_N);
+        Matrix m2 = Matrix.buildZeroMatrix(DEFAULT_MATRIX_M,DEFAULT_MATRIX_N);
+
+        try {
+            m1 = Matrix.fromString(m1Value);
+            m2 = Matrix.fromString(m2Value);
+        } catch (NumberFormatException e) {
+            log.error("original error: " + e.getMessage());
+            //TODO: more error handling
+        }
+
+        Matrix sum = MatrixAlgebra.add(m1,m2);
+        return sum.getNumbers();
     }
 
 }

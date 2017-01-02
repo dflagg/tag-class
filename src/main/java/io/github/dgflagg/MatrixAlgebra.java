@@ -5,6 +5,7 @@ import io.github.dgflagg.exceptions.ColumnsMustEqualRowsException;
 import io.github.dgflagg.model.Matrix;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 public class MatrixAlgebra {
 
     private MatrixAlgebra() {
-
+        //don't want to instantiate this class
     }
 
     /**
@@ -93,6 +94,16 @@ public class MatrixAlgebra {
         Matrix sum = Matrix.buildMatrix(numbers);
 
         return sum;
+    }
+
+    public static Matrix subtract(Matrix m1, Matrix m2) {
+        //TODO: implement me!
+
+        //multiply m2 by scalar -1
+
+        //add m1 to m2
+
+        throw new RuntimeException("Not yet implemented!");
     }
 
     /**

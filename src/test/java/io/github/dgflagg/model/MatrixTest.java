@@ -1,5 +1,6 @@
 package io.github.dgflagg.model;
 
+import io.github.dgflagg.MatrixAlgebra;
 import io.github.dgflagg.exceptions.IndexExceedsSizeException;
 import io.github.dgflagg.exceptions.NegativeIndexException;
 import org.junit.BeforeClass;
@@ -118,6 +119,27 @@ public class MatrixTest {
     public void verify_buildZeroMatrix() {
         assertThat(ZERO_MATRIX.getRowCount(), equalTo(ROW_COUNT));
         assertThat(ZERO_MATRIX.getColumnCount(), equalTo(COLUMN_COUNT));
+
+        for(List<Double> row : ZERO_MATRIX.getNumbers()) {
+            for(Double number : row) {
+                assertThat(number, equalTo(0d));
+            }
+        }
+    }
+
+    @Test
+    public void verify_buildValueMatrix() {
+        Double VALUE = 3.4;
+        Matrix valueMatrix = Matrix.buildValueMatrix(ROW_COUNT, COLUMN_COUNT, VALUE);
+
+        assertThat(valueMatrix.getRowCount(), equalTo(ROW_COUNT));
+        assertThat(valueMatrix.getColumnCount(), equalTo(COLUMN_COUNT));
+
+        for(List<Double> row : valueMatrix.getNumbers()) {
+            for(Double number : row) {
+                assertThat(number, equalTo(VALUE));
+            }
+        }
     }
 
     @Test
@@ -139,6 +161,21 @@ public class MatrixTest {
         Matrix m2x4 = Matrix.csv("src/test/resources/2x4-matrix.csv");
         assertThat(m2x4.getRowCount(), equalTo(2));
         assertThat(m2x4.getColumnCount(), equalTo(4));
+    }
+
+    @Test
+    public void verify_fromString() {
+        Matrix m3x3 = Matrix.csv("src/test/resources/3x3-matrix.csv");
+        Matrix m4x2 = Matrix.csv("src/test/resources/4x2-matrix.csv");
+        Matrix m2x4 = Matrix.csv("src/test/resources/2x4-matrix.csv");
+
+        Matrix m3x3Output = Matrix.fromString(m3x3.toString());
+        Matrix m4x2Output = Matrix.fromString(m4x2.toString());
+        Matrix m2x4Output = Matrix.fromString(m2x4.toString());
+
+        assertTrue(MatrixAlgebra.isEqual(m3x3,m3x3Output));
+        assertTrue(MatrixAlgebra.isEqual(m4x2,m4x2Output));
+        assertTrue(MatrixAlgebra.isEqual(m2x4,m2x4Output));
     }
 
 }

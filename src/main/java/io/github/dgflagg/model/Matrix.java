@@ -54,24 +54,13 @@ public class Matrix {
 
     }
 
+    /**
+     * Returns the values of the matrix in a standard format without spaces
+     * @return
+     */
     @Override
     public String toString() {
-
-        String str = "";
-
-        for(List<Double> row : numbers) {
-
-            for(Double number : row) {
-
-                str = str.concat(number + " ");
-
-            }
-
-            str = str.concat("\n");
-
-        }
-
-        return str;
+        return this.getNumbers().toString().replace(" ","");
     }
 
     /**
@@ -116,19 +105,35 @@ public class Matrix {
     }
 
     /**
-     * Creates a matrix of only zeroes with m x n
+     * Creates a matrix of only zeroes with m x n dimensions
      * @param m rows
      * @param n columns
      * @return
      */
     public static Matrix buildZeroMatrix(int m, int n) {
-        log.info("building empty matrix when m = {} and n = {}", m, n);
+        log.info("building zero matrix when m = {} and n = {}", m, n);
 
+        Matrix matrix = Matrix.buildValueMatrix(m, n, 0d);
+        matrix.setName("zero (" + m + ", " + n + ") matrix");
+        return matrix;
+    }
+
+    /**
+     * Creates a matrix filled with only the specified value with dimensions m x n
+     * @param m rows
+     * @param n columns
+     * @param value the value that is used for every number in the matrix
+     * @return
+     */
+    public static Matrix buildValueMatrix(int m, int n, Double value) {
+        log.info("building value matrix when m = {}, n = {} and value = {}", m, n, value);
+
+        //TODO: build common function for testing dimensions and use in each build function
         Assert.isTrue(n > -1, "cannot create a matrix with negative dimension size");
         Assert.isTrue(m > -1, "cannot create a matrix with negative dimension size");
 
         Matrix matrix = new Matrix();
-        matrix.setName("zero (" + m + ", " + n + ") matrix");
+        matrix.setName("value (" + m + ", " + n + ") matrix");
 
         List<List<Double>> numbers = new ArrayList<List<Double>>();
 
@@ -138,7 +143,7 @@ public class Matrix {
 
             for(int column = 1; column <= n; column++) {
 
-                rows.add(0d);
+                rows.add(value);
 
             }
 
@@ -146,9 +151,10 @@ public class Matrix {
         }
 
         matrix.setNumbers(numbers);
-
-        return  matrix;
+        return matrix;
     }
+
+
 
     /**
      * Returns the value at in the matrix at location i, j
@@ -287,6 +293,90 @@ public class Matrix {
         Matrix matrix = Matrix.buildMatrix(numbers);
         matrix.setName(file);
         return matrix;
+    }
+
+    /**
+     * Converts the contents of a two dimensional string array representing the values in a matrix to a matrix instance
+     * Expected format: "[[1,2,3],[4,5,6]]" where each inner square bracket grouping represents the contents of one
+     * entire row and "],[" delineates between the rows
+     * The entire matrix is represented on a single line surrounded by enclosing square brackets
+     * Spaces and jagged matrices are not supported
+     * @param strArr
+     * @return
+     */
+    public static Matrix fromString(String strArr) {
+
+        //represents the "],[" delineating rows in the string matrix
+        final String ROW_DELIMITER = "],\\[";
+
+        //represents the comma delineating individual values in the string matrix
+        final String VALUE_DELIMITER = ",";
+
+        //represents the start of a row
+        final String BEGIN_ROW_SYMBOL = "[";
+
+        //represents the end of a row
+        final String END_ROW_SYMBOL = "]";
+
+        //represents the start of the matrix
+        final String BEGIN_MATRIX_SYMBOL = "[[";
+
+        //represents the end of the matrix
+        final String END_MATRIX_SYMBOL = "]]";
+
+        //strip the spaces from the string
+        String strippedSpaces = strArr.replace(" ","");
+
+        //strip the surrounding square brackets
+        String strippedWrapperBrackets = strippedSpaces
+                .replace(BEGIN_MATRIX_SYMBOL, BEGIN_ROW_SYMBOL)
+                .replace(END_MATRIX_SYMBOL, END_ROW_SYMBOL);
+
+        //split the stripped string by the row delimiter
+        String[] rows = strippedWrapperBrackets.split(ROW_DELIMITER);
+
+        List<List<Double>> numbers = new ArrayList<>();
+
+        //iterate through the rows of the string array
+        for(String row : rows) {
+
+            //strip the row brackets from the string and split on the comma
+            String[] values = row.replace(BEGIN_ROW_SYMBOL,"").replace(END_ROW_SYMBOL,"").split(VALUE_DELIMITER);
+
+            List<Double> numberRows = new ArrayList<>();
+
+            //iterate through each value in this row
+            for(String value : values) {
+
+                Double number = new Double(value);
+                numberRows.add(number);
+
+            }
+
+            numbers.add(numberRows);
+        }
+
+        Matrix matrix = Matrix.buildMatrix(numbers);
+        return matrix;
+    }
+
+    //TODO: this function probably does not belong here permanently - find me a better home
+    //This is probably because this accepts a matrix and performs work on it returning a new matrix instead of operating
+    //on the local matrix instance
+    public static Matrix buildAugmentedCoefficientColumnMatrix(Matrix matrix, List<Double> coefficientColumnValues) {
+
+        //check that the coefficient column size is equal to the existing matrix's row count
+
+        List<List<Double>> numbers = new ArrayList<>();
+
+        for(List<Double> row : matrix.getNumbers()) {
+
+
+
+        }
+
+        Matrix augmentedMatrix = Matrix.buildMatrix(numbers);
+        return augmentedMatrix;
     }
 
     /**
