@@ -136,4 +136,15 @@ public class MatrixControllerTest {
                 .andExpect(jsonPath("*").value(sumMatrix.getNumbers()));
     }
 
+    @Test
+    public void subtractShouldReturnDifferenceMatrix() throws Exception {
+        Matrix m1 = Matrix.csv("src/test/resources/3x3-matrix.csv");
+        Matrix m2 = Matrix.buildValueMatrix(3,3,7d);
+        Matrix differenceMatrix = MatrixAlgebra.subtract(m1,m2);
+
+        this.mockMvc.perform(get("/matrix/subtract").param("m1", m1.toString()).param("m2", m2.toString()))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("*").value(differenceMatrix.getNumbers()));
+    }
+
 }

@@ -96,6 +96,36 @@ public class MatrixAlgebraTest {
         MatrixAlgebra.add(m1,m2);
     }
 
+    @Test
+    public void verify_subtract() {
+        Matrix m1 = Fixtures.MATRIX();
+        Matrix m2 = Fixtures.MATRIX_3_3();
+
+        Matrix difference = MatrixAlgebra.subtract(m1, m2);
+
+        for(int i = 0; i < m1.getRowCount(); i++) {
+            for(int j = 0; j < m1.getColumnCount(); j++) {
+                assertThat(difference.getNumber(i, j), equalTo(m1.getNumber(i, j) - m2.getNumber(i, j)));
+            }
+        }
+    }
+
+    @Test(expected = DimensionsNotSimilarException.class)
+    public void verify_subtract_throws_DimensionsNotSimilarException_when_rows_are_not_equivalent() {
+        Matrix m1 = Matrix.buildZeroMatrix(N, N);
+        Matrix m2 = Matrix.buildZeroMatrix(N + 1, N);
+
+        MatrixAlgebra.subtract(m1,m2);
+    }
+
+    @Test(expected = DimensionsNotSimilarException.class)
+    public void verify_subtract_throws_DimensionsNotSimilarException_when_columns_are_not_equivalent() {
+        Matrix m1 = Matrix.buildZeroMatrix(N, N);
+        Matrix m2 = Matrix.buildZeroMatrix(N, N + 1);
+
+        MatrixAlgebra.subtract(m1,m2);
+    }
+
     @Test(expected = DimensionsNotSimilarException.class)
     public void verify_dotProduct_throws_DimensionsNotSimilarException_when_vector_size_is_different() {
         Matrix m1 = Matrix.buildZeroMatrix(N, N + 1);

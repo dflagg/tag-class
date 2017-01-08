@@ -110,4 +110,23 @@ public class MatrixController {
         return sum.getNumbers();
     }
 
+    @RequestMapping("/subtract")
+    public List<List<Double>> subtract(@RequestParam(value="m1", defaultValue="[]") String m1Value,
+                                       @RequestParam(value="m2", defaultValue="[]") String m2Value) {
+
+        Matrix m1 = Matrix.buildZeroMatrix(DEFAULT_MATRIX_M,DEFAULT_MATRIX_N);
+        Matrix m2 = Matrix.buildZeroMatrix(DEFAULT_MATRIX_M,DEFAULT_MATRIX_N);
+
+        try {
+            m1 = Matrix.fromString(m1Value);
+            m2 = Matrix.fromString(m2Value);
+        } catch (NumberFormatException e) {
+            log.error("original error: " + e.getMessage());
+            //TODO: more error handling
+        }
+
+        Matrix difference = MatrixAlgebra.subtract(m1,m2);
+        return difference.getNumbers();
+    }
+
 }
