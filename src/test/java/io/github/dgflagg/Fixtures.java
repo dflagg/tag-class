@@ -35,4 +35,29 @@ public class Fixtures {
         return matrix;
     }
 
+    public static Matrix MATRIX_3_3() {
+        int N = 3;
+
+        List<List<Double>> numbers = new ArrayList<>();
+
+        int index = 9;
+        for(int i = 0; i < N; i++) {
+
+            List<Double> row = new ArrayList<>();
+
+            for(int j = 0; j < N; j++) {
+
+                row.add(new Double(index));
+                index--;
+
+            }
+
+            numbers.add(row);
+
+        }
+
+        Matrix matrix = Matrix.buildMatrix(numbers);
+        return matrix;
+    }
+
 }

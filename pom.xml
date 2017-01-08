@@ -6,7 +6,7 @@
 
     <groupId>io.github.dgflagg</groupId>
     <artifactId>tag-class</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
 
     <developers>
         <developer>
@@ -143,10 +143,10 @@
                             <goal>build</goal>
                         </goals>
                     </execution>
-                    <!-- tag docker image in package phase -->
+                    <!-- tag docker image in install phase -->
                     <execution>
                         <id>tag-image</id>
-                        <phase>package</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>tag</goal>
                         </goals>
@@ -159,9 +159,9 @@
                             <newName>${docker.image.name}</newName>
                         </configuration>
                     </execution>
-                    <!-- pushes docker image to remote repo -->
+                    <!-- pushes docker image and tag to remote repo -->
                     <execution>
-                        <id>push-image</id>
+                        <id>push-image-version</id>
                         <phase>deploy</phase>
                         <goals>
                             <goal>push</goal>
@@ -170,6 +170,19 @@
                             <useConfigFile>true</useConfigFile>
                             <!-- push the docker image with project version tag -->
                             <imageName>${docker.image.tag.name}</imageName>
+                        </configuration>
+                    </execution>
+                    <!-- pushes docker image and tag to remote repo -->
+                    <execution>
+                        <id>push-image-latest</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <useConfigFile>true</useConfigFile>
+                            <!-- push the docker image with latest tag -->
+                            <imageName>${docker.image.name}:latest</imageName>
                         </configuration>
                     </execution>
                 </executions>

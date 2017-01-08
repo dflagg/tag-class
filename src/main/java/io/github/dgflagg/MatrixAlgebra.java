@@ -96,14 +96,22 @@ public class MatrixAlgebra {
         return sum;
     }
 
+    /**
+     * Returns the difference between matrix m1 and matrix m2
+     * @param m1
+     * @param m2
+     * @return
+     */
     public static Matrix subtract(Matrix m1, Matrix m2) {
-        //TODO: implement me!
+        log.info("subtracting matrix: " + m2.getName() + " from: " + m1.getName());
 
         //multiply m2 by scalar -1
+        Matrix scaledM2 = MatrixAlgebra.scalarMultiply(m2, -1d);
 
         //add m1 to m2
+        Matrix difference = MatrixAlgebra.add(m1, scaledM2);
 
-        throw new RuntimeException("Not yet implemented!");
+        return difference;
     }
 
     /**
