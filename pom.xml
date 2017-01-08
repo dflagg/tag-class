@@ -6,7 +6,7 @@
 
     <groupId>io.github.dgflagg</groupId>
     <artifactId>tag-class</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
 
     <developers>
         <developer>
@@ -23,6 +23,7 @@
     <properties>
         <!-- common versions -->
         <logback.version>1.1.7</logback.version>
+        <springfox.version>2.4.0</springfox.version>
 
         <!-- docker properties -->
         <docker.repository>dgflagg</docker.repository>
@@ -47,6 +48,17 @@
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <scope>test</scope>
+        </dependency>
+        <!-- swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${springfox.version}</version>
         </dependency>
         <!-- logging -->
         <dependency>
