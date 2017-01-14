@@ -7,6 +7,7 @@ import io.github.dgflagg.exceptions.NegativeIndexException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,6 +164,19 @@ public class MatrixTest {
         Matrix m2x4 = Matrix.csv("src/test/resources/2x4-matrix.csv");
         assertThat(m2x4.getRowCount(), equalTo(2));
         assertThat(m2x4.getColumnCount(), equalTo(4));
+    }
+
+    @Test
+    public void verify_to_csv_file() {
+        Matrix m2x4 = Matrix.csv("src/test/resources/2x4-matrix.csv");
+        m2x4.setName("testCsv");
+        m2x4.csv();
+        Matrix csvMatrix = Matrix.csv("testCsv.csv");
+
+        File csvFile = new File("testCsv.csv");
+        csvFile.delete();
+
+        assertTrue(MatrixAlgebra.isEqual(m2x4, csvMatrix));
     }
 
     @Test

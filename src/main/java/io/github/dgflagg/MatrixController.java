@@ -21,7 +21,45 @@ public class MatrixController {
 
     //TODO: add error response codes with appropriate messages for bad input
 
-    //TODO: accept put/post request to persist a matrix to file or db
+    //TODO: add option to persist to db
+
+    //TODO: this should really be a put/post request because it will write a value to the host
+    @RequestMapping("/save")
+    public String save(@RequestParam(value="name", defaultValue="m1") String m1Value,
+                       @RequestParam(value="m", defaultValue="[]") String mValue) {
+
+        String name = "m1";  //default name
+        Matrix m = Matrix.buildZeroMatrix(DEFAULT_MATRIX_M,DEFAULT_MATRIX_N);
+
+        try {
+            name = m1Value;
+            m = Matrix.fromString(mValue);
+        } catch (NumberFormatException e) {
+            log.error("original error: " + e.getMessage());
+            //TODO: more error handling
+        }
+
+        //add the name provided to the matrix
+        m.setName(name);
+
+        //save the matrix to a csv file
+        m.csv();
+
+        //return the name of the matrix just saved to csv file
+        return m.getName();
+    }
+
+    @RequestMapping("/retrieve")
+    public List<List<Double>> retrieve(@RequestParam(value="name", defaultValue="m1") String m1Value) {
+
+        String name = m1Value;
+
+        //read the matrix from the csv file
+        Matrix matrix = Matrix.csv(name + ".csv");
+
+        //return the name of the matrix just saved to csv file
+        return matrix.getNumbers();
+    }
 
     @RequestMapping("/id")
     public List<List<Double>> id(@RequestParam(value="n", defaultValue="0") String nValue) {
