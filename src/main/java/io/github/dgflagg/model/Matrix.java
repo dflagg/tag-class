@@ -1,5 +1,6 @@
 package io.github.dgflagg.model;
 
+import io.github.dgflagg.exceptions.ColumnsMustEqualRowsException;
 import io.github.dgflagg.exceptions.IndexExceedsSizeException;
 import io.github.dgflagg.exceptions.NegativeIndexException;
 import lombok.Data;
@@ -38,9 +39,9 @@ public class Matrix {
      */
     public void print() {
 
-        System.out.println("name: " + this.name);
+        System.out.println("name: " + this.getName());
 
-        for(List<Double> row : numbers) {
+        for(List<Double> row : this.getNumbers()) {
 
             for(Double number : row) {
 
@@ -49,6 +50,29 @@ public class Matrix {
             }
 
             System.out.println();
+
+        }
+
+    }
+
+    /**
+     * Logs the string representation of the name and contents of this matrix to info log
+     */
+    public void log() {
+
+        log.info("name: " + this.getName());
+
+        for(List<Double> row : this.getNumbers()) {
+
+            String rowValues = "";
+
+            for(Double number : row) {
+
+                rowValues = rowValues + number + " ";
+
+            }
+
+            log.info(rowValues);
 
         }
 
@@ -360,22 +384,66 @@ public class Matrix {
         return matrix;
     }
 
-    //TODO: this function probably does not belong here permanently - find me a better home
-    //This is probably because this accepts a matrix and performs work on it returning a new matrix instead of operating
-    //on the local matrix instance
+    /**
+     * Returns a list of values from a string array by using the fromString method and only returning the first row
+     * @param strArr
+     * @return
+     */
+    public static List<Double> vectorFromString(String strArr) {
+        List<Double> numbers = fromString(strArr).getRow(0);
+        return numbers;
+    }
+
+    /**
+     * Given a matrix and a list of coefficients - appends one coefficient value to each row in the matrix
+     * @param matrix
+     * @param coefficientColumnValues
+     * @return
+     */
     public static Matrix buildAugmentedCoefficientColumnMatrix(Matrix matrix, List<Double> coefficientColumnValues) {
+        //TODO: this function probably does not belong here permanently - find me a better home
+        //This is probably because this accepts a matrix and performs work on it returning a new matrix instead of operating
+        //on the local matrix instance
+
+        log.info("building augmented coefficient matrix");
 
         //check that the coefficient column size is equal to the existing matrix's row count
+        if(coefficientColumnValues.size() != matrix.getRowCount()) {
 
-        List<List<Double>> numbers = new ArrayList<>();
-
-        for(List<Double> row : matrix.getNumbers()) {
-
-
+            ColumnsMustEqualRowsException e = new ColumnsMustEqualRowsException("the column size of the coefficient column must be equal to the row size of the matrix");
+            log.error(e.getMessage());
+            throw e;
 
         }
 
+        //counter for tracking the current value of the coefficient column list
+        int i = 0;
+        List<List<Double>> numbers = new ArrayList<>();
+
+        //iterate through each of the rows in the original matrix
+        for(List<Double> row : matrix.getNumbers()) {
+
+            //iterate through each of the values in a row of the original matrix
+            List<Double> numberRow = new ArrayList<>();
+            for(Double number : row) {
+
+                //add each value from the original matrix to the new matrix row
+                numberRow.add(number);
+
+            }
+
+            //add the value of from the coefficient column to this row
+            numberRow.add(coefficientColumnValues.get(i));
+
+            //increment coefficient column value counter
+            i++;
+
+            //add each of the new rows to the new matrix
+            numbers.add(numberRow);
+        }
+
         Matrix augmentedMatrix = Matrix.buildMatrix(numbers);
+        augmentedMatrix.setName("augmented_" + matrix.getName());
         return augmentedMatrix;
     }
 

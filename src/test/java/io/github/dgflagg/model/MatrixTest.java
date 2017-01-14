@@ -1,11 +1,13 @@
 package io.github.dgflagg.model;
 
 import io.github.dgflagg.MatrixAlgebra;
+import io.github.dgflagg.exceptions.ColumnsMustEqualRowsException;
 import io.github.dgflagg.exceptions.IndexExceedsSizeException;
 import io.github.dgflagg.exceptions.NegativeIndexException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -176,6 +178,34 @@ public class MatrixTest {
         assertTrue(MatrixAlgebra.isEqual(m3x3,m3x3Output));
         assertTrue(MatrixAlgebra.isEqual(m4x2,m4x2Output));
         assertTrue(MatrixAlgebra.isEqual(m2x4,m2x4Output));
+    }
+
+    @Test(expected = ColumnsMustEqualRowsException.class)
+    public void verify_buildAugmentedCoefficientColumnMatrix_throws_ColumnsMustEqualRowsException_when_columns_dont_equal_rows() {
+        List<Double> coefficientColumn = new ArrayList<>();
+        coefficientColumn.add(1d);
+        coefficientColumn.add(2d);
+
+        Matrix.buildAugmentedCoefficientColumnMatrix(Matrix.csv("src/test/resources/3x3-matrix.csv"), coefficientColumn);
+    }
+
+    @Test
+    public void verify_buildAugmentedCoefficientColumnMatrix() {
+        Matrix m3x3 = Matrix.csv("src/test/resources/3x3-matrix.csv");
+
+        List<Double> coefficientColumn = new ArrayList<>();
+        coefficientColumn.add(1d);
+        coefficientColumn.add(2d);
+        coefficientColumn.add(3d);
+
+        Matrix augmentedMatrix = Matrix.buildAugmentedCoefficientColumnMatrix(m3x3, coefficientColumn);
+
+        for(int i = 0; i < augmentedMatrix.getRowCount(); i++) {
+            for(int j = 0; j < m3x3.getColumnCount(); j++) {
+                assertThat(augmentedMatrix.getNumber(i,j), equalTo(m3x3.getNumber(i, j)));
+            }
+            assertThat(augmentedMatrix.getNumber(i, m3x3.getColumnCount()), equalTo(coefficientColumn.get(i)));
+        }
     }
 
 }
