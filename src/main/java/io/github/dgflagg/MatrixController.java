@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,8 +18,6 @@ import java.util.List;
 public class MatrixController {
     private static final int DEFAULT_MATRIX_N = 0;
     private static final int DEFAULT_MATRIX_M = 0;
-
-    //TODO: add matrix multiplication request mapping
 
     //TODO: add error response codes with appropriate messages for bad input
 
@@ -70,6 +69,24 @@ public class MatrixController {
         }
 
         return matrix.getNumbers();
+    }
+
+    @RequestMapping("/augment")
+    public List<List<Double>> augment(@RequestParam(value="m", defaultValue="[]") String mValue,
+                                      @RequestParam(value="c", defaultValue="[]") String cValue) {
+        List<Double> c = new ArrayList<>();
+        Matrix m = Matrix.buildZeroMatrix(DEFAULT_MATRIX_M,DEFAULT_MATRIX_N);
+
+        try {
+            c = Matrix.vectorFromString(cValue);
+            m = Matrix.fromString(mValue);
+        } catch (NumberFormatException e) {
+            log.error("original error: " + e.getMessage());
+            //TODO: more error handling
+        }
+
+        Matrix augmentedMatrix = Matrix.buildAugmentedCoefficientColumnMatrix(m, c);
+        return augmentedMatrix.getNumbers();
     }
 
     @RequestMapping("/scalar")
@@ -127,6 +144,25 @@ public class MatrixController {
 
         Matrix difference = MatrixAlgebra.subtract(m1,m2);
         return difference.getNumbers();
+    }
+
+    @RequestMapping("/multiply")
+    public List<List<Double>> multiply(@RequestParam(value="m1", defaultValue="[]") String m1Value,
+                                       @RequestParam(value="m2", defaultValue="[]") String m2Value) {
+
+        Matrix m1 = Matrix.buildZeroMatrix(DEFAULT_MATRIX_M,DEFAULT_MATRIX_N);
+        Matrix m2 = Matrix.buildZeroMatrix(DEFAULT_MATRIX_M,DEFAULT_MATRIX_N);
+
+        try {
+            m1 = Matrix.fromString(m1Value);
+            m2 = Matrix.fromString(m2Value);
+        } catch (NumberFormatException e) {
+            log.error("original error: " + e.getMessage());
+            //TODO: more error handling
+        }
+
+        Matrix product = MatrixAlgebra.multiply(m1,m2);
+        return product.getNumbers();
     }
 
 }

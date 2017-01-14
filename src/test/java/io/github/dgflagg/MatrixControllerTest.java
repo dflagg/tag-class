@@ -9,6 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -145,6 +148,31 @@ public class MatrixControllerTest {
         this.mockMvc.perform(get("/matrix/subtract").param("m1", m1.toString()).param("m2", m2.toString()))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("*").value(differenceMatrix.getNumbers()));
+    }
+
+    @Test
+    public void augmentMatrixShouldReturnAugmentedMatrix() throws Exception {
+        Matrix m1 = Matrix.csv("src/test/resources/3x3-matrix.csv");
+        List<Double> coefficientColumn = new ArrayList<>();
+        coefficientColumn.add(5d);
+        coefficientColumn.add(3d);
+        coefficientColumn.add(6d);
+        Matrix augmentedMatrix = Matrix.buildAugmentedCoefficientColumnMatrix(m1, coefficientColumn);
+
+        this.mockMvc.perform(get("/matrix/augment").param("m", m1.toString()).param("c", coefficientColumn.toString()))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("*").value(augmentedMatrix.getNumbers()));
+    }
+
+    @Test
+    public void multiplyShouldReturnProductMatrix() throws Exception {
+        Matrix m1 = Matrix.csv("src/test/resources/4x2-matrix.csv");
+        Matrix m2 = Matrix.csv("src/test/resources/2x4-matrix.csv");
+        Matrix productMatrix = MatrixAlgebra.multiply(m1,m2);
+
+        this.mockMvc.perform(get("/matrix/multiply").param("m1", m1.toString()).param("m2", m2.toString()))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("*").value(productMatrix.getNumbers()));
     }
 
 }
