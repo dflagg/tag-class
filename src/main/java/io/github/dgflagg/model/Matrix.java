@@ -7,10 +7,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -252,6 +249,59 @@ public class Matrix {
         matrix.setNumbers(numbers);
 
         return matrix;
+    }
+
+    /**
+     * Saves this matrix to a csv file where the contents of the csv file are the values of the matrix
+     * and the name of the csv file is the name of the matrix with .csv extension
+     */
+    public void csv() {
+        final String CSV_FILE_EXTENSION = ".csv";
+        final String VALUE_SEPARATOR = ",";
+        final String LINE_SEPARATOR = "\n";
+
+        String csvFileName = this.getName() + CSV_FILE_EXTENSION;
+
+        log.info("writing matrix: {} to csv file with name: {}", this.getName(), csvFileName);
+
+        FileWriter fileWriter = null;
+        try {
+            //create the csv file that will be written to
+            fileWriter = new FileWriter(csvFileName);
+
+            //iterate through the rows in the matrix
+            for(int i = 0; i < this.getRowCount(); i++) {
+
+                //iterate through the columns
+                for(int j = 0; j < this.getColumnCount(); j++) {
+
+                    //last element in the row - do not append a comma to the last line
+                    if(j == this.getColumnCount() - 1) {
+                        fileWriter.append(this.getNumber(i, j).toString());
+                    } else {
+                        fileWriter.append(this.getNumber(i, j) + VALUE_SEPARATOR);
+                    }
+
+                }
+
+                //write line break on each new row
+                fileWriter.append(LINE_SEPARATOR);
+
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        } finally {
+
+            try {
+                fileWriter.flush();
+                fileWriter.close();
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+
+        }
+
     }
 
     /**

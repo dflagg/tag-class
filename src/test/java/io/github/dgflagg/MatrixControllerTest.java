@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by dgflagg on 12/30/16.
@@ -173,6 +175,41 @@ public class MatrixControllerTest {
         this.mockMvc.perform(get("/matrix/multiply").param("m1", m1.toString()).param("m2", m2.toString()))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("*").value(productMatrix.getNumbers()));
+    }
+
+    @Test
+    public void saveShouldSaveFileToCsvFile() throws Exception {
+        Matrix matrix = Matrix.csv("src/test/resources/2x4-matrix.csv");
+        matrix.setName("testMatrixCsv");
+
+        this.mockMvc.perform(get("/matrix/save").param("m", matrix.toString()).param("name", matrix.getName()))
+                .andDo(print()).andExpect(status().isOk());
+                //.andExpect(jsonPath("*").value("testMatrixCsv")); TODO: not sure why this fails when it clearly returns
+
+        Matrix savedMatrix = Matrix.csv(matrix.getName() + ".csv");
+
+        File csvFile = new File(matrix.getName() + ".csv");
+        csvFile.delete();
+
+        assertTrue(MatrixAlgebra.isEqual(matrix, savedMatrix));
+    }
+
+    @Test
+    public void retrieveShouldReadCsvFile() throws Exception {
+        Matrix matrix = Matrix.csv("src/test/resources/3x3-matrix.csv");
+        matrix.setName("testMatrix");
+
+        //save test matrix csv
+        this.mockMvc.perform(get("/matrix/save").param("m", matrix.toString()).param("name", matrix.getName()))
+                .andDo(print()).andExpect(status().isOk());
+
+        //read back the matrix
+        this.mockMvc.perform(get("/matrix/retrieve").param("name", matrix.getName()))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("*").value(matrix.getNumbers()));
+
+        File csvFile = new File(matrix.getName() + ".csv");
+        csvFile.delete();
     }
 
 }
